@@ -161,6 +161,7 @@
     </div>
     <div class="tabs">
       <button class="tab-btn sans active" id="tab-cours" onclick="switchTab('cours')">Cours</button>
+      <button class="tab-btn sans" id="tab-mescours" onclick="switchTab('mescours')">Mes cours</button>
       <button class="tab-btn sans" id="tab-leitner" onclick="switchTab('leitner')">Leitner</button>
     </div>
   </div>
@@ -210,8 +211,10 @@ async function callClaude(systemPrompt, userContent, maxTokens) {
 
 function switchTab(tab) {
   document.getElementById('tab-cours').classList.toggle('active', tab === 'cours');
+  document.getElementById('tab-mescours').classList.toggle('active', tab === 'mescours');
   document.getElementById('tab-leitner').classList.toggle('active', tab === 'leitner');
   if (tab === 'cours') renderCoursAccueil();
+  else if (tab === 'mescours') renderMesCours();
   else renderLeitnerHome();
 }
 
@@ -315,12 +318,84 @@ async function lancerCours() {
     coursState.cours = parsed;
     coursState.activeChapter = 0;
     coursState.phase = "cours";
+    coursState.coursId = sauvegarderCours(parsed);
     renderCoursResultat();
   } catch (e) {
     coursState.error = e.message || String(e);
     coursState.phase = "erreur";
     renderCoursErreur();
   }
+}
+
+// ── Stockage des cours générés ──
+const COURS_STORAGE = "cours_historique_v1";
+
+function loadCoursHistorique() {
+  try { return JSON.parse(localStorage.getItem(COURS_STORAGE)) || []; } catch { return []; }
+}
+function saveCoursHistorique(list) {
+  localStorage.setItem(COURS_STORAGE, JSON.stringify(list));
+}
+function sauvegarderCours(cours) {
+  const list = loadCoursHistorique();
+  const id = Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+  list.unshift({ id, cours, createdAt: new Date().toISOString() });
+  saveCoursHistorique(list);
+  return id;
+}
+function deleteCoursHistorique(id) {
+  const list = loadCoursHistorique().filter(item => item.id !== id);
+  saveCoursHistorique(list);
+}
+
+function renderMesCours() {
+  const list = loadCoursHistorique();
+  const main = document.getElementById('main');
+  if (!list.length) {
+    main.innerHTML = `
+      <div class="card fade-in">
+        <h2 class="card-title">Mes cours</h2>
+        <p class="card-sub sans">Aucun cours sauvegardé pour le moment. Génère un cours dans l'onglet "Cours" — il apparaîtra ici automatiquement.</p>
+      </div>`;
+    return;
+  }
+  main.innerHTML = `
+    <div style="width:100%;max-width:600px" class="fade-in">
+      <h2 class="card-title" style="margin-bottom:6px">Mes cours</h2>
+      <p class="sans" style="font-size:13px;color:#666;margin-bottom:18px">${list.length} cours sauvegardé${list.length > 1 ? 's' : ''} sur cet appareil</p>
+      ${list.map(item => {
+        const c = item.cours;
+        const date = new Date(item.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+        return `
+        <div class="card-row" style="padding:14px 16px;cursor:pointer;align-items:center" onclick="ouvrirCoursHistorique('${item.id}')">
+          <span style="font-size:24px">${c.emoji || '📖'}</span>
+          <div class="meta sans" style="flex:1">
+            <div class="q" style="font-size:14.5px">${c.titre}</div>
+            <div class="s">${date} · ${c.niveau_difficulte || ''}</div>
+          </div>
+          <button class="btn-del" onclick="event.stopPropagation(); supprimerCoursHistorique('${item.id}')" style="font-size:16px">✕</button>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function ouvrirCoursHistorique(id) {
+  const list = loadCoursHistorique();
+  const item = list.find(i => i.id === id);
+  if (!item) return;
+  coursState.cours = item.cours;
+  coursState.activeChapter = 0;
+  coursState.phase = "cours";
+  coursState.coursId = id;
+  document.getElementById('tab-cours').classList.add('active');
+  document.getElementById('tab-mescours').classList.remove('active');
+  document.getElementById('tab-leitner').classList.remove('active');
+  renderCoursResultat();
+}
+
+function supprimerCoursHistorique(id) {
+  deleteCoursHistorique(id);
+  renderMesCours();
 }
 
 function renderCoursLoading() {
