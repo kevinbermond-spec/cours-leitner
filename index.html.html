@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cours du soir & Leitner</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0d0f14;
+    color: #e8e4d9;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    min-height: 100vh;
+  }
+  .sans { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  .mono { font-family: 'Courier New', monospace; }
+
+  /* Header */
+  header {
+    background: #13161e;
+    border-bottom: 1px solid #2a2d3a;
+    padding: 14px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+  .header-inner { max-width: 760px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+  .logo-emoji { font-size: 26px; }
+  .logo-title { font-size: 13px; font-family: 'Courier New', monospace; letter-spacing: 3px; color: #c9a84c; font-weight: bold; }
+  .logo-sub { font-size: 11px; color: #555; }
+  .tabs { margin-left: auto; display: flex; gap: 6px; }
+  .tab-btn {
+    background: transparent; border: 1px solid #2a2d3a; color: #888;
+    padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 13px;
+  }
+  .tab-btn.active { background: #c9a84c; border-color: #c9a84c; color: #0d0f14; font-weight: bold; }
+
+  main { max-width: 760px; margin: 0 auto; padding: 28px 16px 60px; display: flex; flex-direction: column; align-items: center; }
+  .hidden { display: none !important; }
+  .fade-in { animation: fadeIn 0.35s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Shared */
+  .card { background: #13161e; border: 1px solid #2a2d3a; border-radius: 16px; padding: 32px 28px; width: 100%; max-width: 560px; display: flex; flex-direction: column; gap: 16px; }
+  .card-title { font-size: 22px; font-weight: normal; color: #e8e4d9; }
+  .card-sub { color: #888; font-size: 14px; }
+  label.field-label { font-size: 11px; letter-spacing: 2px; color: #c9a84c; text-transform: uppercase; margin-bottom: -8px; display: block; }
+  select, input[type=text], textarea {
+    background: #0d0f14; border: 1px solid #2a2d3a; color: #e8e4d9;
+    padding: 10px 14px; border-radius: 8px; font-size: 14px; outline: none;
+    width: 100%; font-family: inherit;
+  }
+  textarea { resize: vertical; min-height: 90px; }
+  .level-row { display: flex; gap: 8px; }
+  .level-btn { flex: 1; padding: 9px 0; background: transparent; border: 1px solid #2a2d3a; color: #888; border-radius: 8px; cursor: pointer; font-size: 13px; }
+  .level-btn.active { background: #c9a84c22; border-color: #c9a84c; color: #c9a84c; }
+  .btn-primary {
+    background: #c9a84c; color: #0d0f14; border: none; padding: 13px 28px;
+    border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; letter-spacing: 0.5px;
+  }
+  .btn-primary:hover { box-shadow: 0 0 20px #c9a84c55; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+  .btn-secondary {
+    background: #1e1e2e; color: #e8e4d9; border: 1px solid #4a4a6a; padding: 13px 28px;
+    border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; width: 100%; max-width: 320px;
+  }
+  .btn-secondary.success { background: #1a2e1a; border-color: #5cb85c; color: #5cb85c; }
+  .btn-secondary.error { background: #2e1a1a; border-color: #e05c5c; color: #e05c5c; }
+
+  .loading-box { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 60px; }
+  .spinner { width: 44px; height: 44px; border: 3px solid #2a2d3a; border-top: 3px solid #c9a84c; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  .loading-text { color: #c9a84c; font-size: 17px; min-width: 200px; text-align: center; }
+  .loading-hint { color: #555; font-size: 13px; }
+  .error-text { color: #ff6b6b; font-size: 16px; }
+
+  /* ── COURS ── */
+  .hero { background: linear-gradient(135deg, #13161e 0%, #1a1d28 100%); border: 1px solid #2a2d3a; border-radius: 16px; padding: 30px 26px; margin-bottom: 18px; text-align: center; width: 100%; }
+  .hero-emoji { font-size: 52px; margin-bottom: 10px; }
+  .badges { display: flex; gap: 8px; justify-content: center; margin-bottom: 14px; }
+  .badge { background: #c9a84c22; border: 1px solid #c9a84c44; color: #c9a84c; padding: 3px 10px; border-radius: 20px; font-size: 12px; }
+  .hero h1 { font-size: 25px; font-weight: bold; margin-bottom: 10px; line-height: 1.3; color: #f0ead6; }
+  .hero-accroche { color: #aaa; font-size: 15px; font-style: italic; line-height: 1.6; }
+  .section-box { background: #13161e; border: 1px solid #2a2d3a; border-radius: 12px; padding: 18px 20px; margin-bottom: 18px; width: 100%; }
+  .pourquoi-box { border-left: 3px solid #c9a84c; border-radius: 0 12px 12px 0; }
+  .section-label { font-size: 11px; letter-spacing: 2px; color: #c9a84c; text-transform: uppercase; display: block; margin-bottom: 10px; }
+  .section-text { color: #ccc; line-height: 1.75; font-size: 14.5px; }
+  .chap-tabs { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; width: 100%; }
+  .chap-tab { background: transparent; border: 1px solid #2a2d3a; color: #888; padding: 6px 13px; border-radius: 8px; cursor: pointer; font-size: 12.5px; }
+  .chap-tab.active { background: #c9a84c; border-color: #c9a84c; color: #0d0f14; font-weight: bold; }
+  .chap-box { background: #13161e; border: 1px solid #2a2d3a; border-radius: 14px; padding: 22px 22px 18px; margin-bottom: 18px; width: 100%; }
+  .chap-box h3 { font-size: 18px; color: #f0ead6; margin-bottom: 13px; }
+  .chap-box p.content { color: #ccc; line-height: 1.8; font-size: 14.5px; margin-bottom: 14px; }
+  .fait-box { background: #0d0f14; border: 1px solid #c9a84c33; border-radius: 10px; padding: 11px 15px; margin-bottom: 13px; }
+  .fait-label { font-size: 10.5px; letter-spacing: 2px; color: #c9a84c; display: block; margin-bottom: 5px; }
+  .retenir-box { background: #1a1f14; border: 1px solid #8fb84c44; border-radius: 10px; padding: 11px 15px; margin-bottom: 13px; }
+  .retenir-label { font-size: 10.5px; letter-spacing: 2px; color: #a8d65c; display: block; margin-bottom: 5px; }
+  .retenir-box p { font-weight: bold; }
+  .chap-nav2 { display: flex; gap: 10px; justify-content: space-between; }
+  .nav-btn { background: transparent; border: 1px solid #2a2d3a; color: #888; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+  .nav-btn.next { background: #c9a84c22; border-color: #c9a84c; color: #c9a84c; margin-left: auto; }
+  .schema-pre { color: #7ec8a4; font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; overflow-x: auto; }
+  .points-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  .points-list li { display: flex; gap: 9px; color: #ccc; font-size: 14px; line-height: 1.5; }
+  .points-list .dot { color: #c9a84c; flex-shrink: 0; }
+  .ressource-link { display: flex; align-items: center; gap: 13px; padding: 11px 13px; background: #0d0f14; border: 1px solid #2a2d3a; border-radius: 10px; text-decoration: none; color: #e8e4d9; margin-bottom: 9px; }
+  .ressource-link:last-child { margin-bottom: 0; }
+  .ressource-type { background: #c9a84c22; border: 1px solid #c9a84c44; color: #c9a84c; padding: 3px 8px; border-radius: 6px; font-size: 10.5px; white-space: nowrap; }
+  .ressource-titre { font-size: 13.5px; margin-bottom: 2px; }
+  .ressource-source { font-size: 11.5px; color: #666; }
+  .ressource-arrow { margin-left: auto; color: #555; }
+  .question-box { background: linear-gradient(135deg, #1a1520 0%, #13161e 100%); border: 1px solid #8b5cf644; border-radius: 12px; padding: 20px 22px; margin-bottom: 18px; width: 100%; }
+  .question-text { color: #d4b8f0; font-style: italic; font-size: 15.5px; line-height: 1.7; }
+  .footer-actions { display: flex; flex-direction: column; align-items: center; gap: 10px; padding-top: 6px; width: 100%; }
+
+  /* ── LEITNER ── */
+  .due-banner { border: 1px solid; border-radius: 14px; padding: 18px 22px; display: flex; align-items: center; gap: 16px; margin-bottom: 18px; width: 100%; }
+  .due-num { font-size: 38px; font-weight: bold; color: #c9a84c; min-width: 46px; text-align: center; }
+  .box-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 18px; width: 100%; }
+  .box-card { background: #13161e; border: 1px solid #2a2d3a; border-radius: 10px; padding: 14px 6px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .box-card .num { font-size: 19px; font-weight: bold; }
+  .box-card .desc { font-size: 10.5px; color: #666; text-align: center; }
+  .actions-col { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+  .action-btn { background: #13161e; border: 1px solid #2a2d3a; border-radius: 12px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; cursor: pointer; text-align: left; color: #ccc; font-size: 14px; width: 100%; }
+  .action-btn:hover { border-color: #4a4a6a; }
+  .action-btn .ic { font-size: 22px; }
+  .progress-row { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; width: 100%; }
+  .progress-track { flex: 1; height: 4px; background: #2a2d3a; border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: #c9a84c; transition: width 0.3s; }
+  .flashcard { background: #13161e; border: 1px solid #2a2d3a; border-radius: 16px; padding: 26px 22px; width: 100%; }
+  .flashcard-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; font-size: 12px; }
+  .card-question { font-size: 19px; line-height: 1.5; color: #f0ead6; margin-bottom: 22px; text-align: center; }
+  .card-answer { background: #0d0f14; border: 1px solid #c9a84c33; border-radius: 10px; padding: 15px 17px; font-size: 14.5px; color: #ddd; line-height: 1.7; margin-bottom: 18px; }
+  .btn-reveal { width: 100%; background: #c9a84c22; border: 1px solid #c9a84c; color: #c9a84c; padding: 13px; border-radius: 10px; cursor: pointer; font-size: 14.5px; }
+  .result-btns { display: flex; gap: 10px; }
+  .btn-no { flex: 1; background: #2e1a1a; border: 1px solid #e05c5c44; color: #e05c5c; padding: 12px; border-radius: 10px; cursor: pointer; font-size: 13.5px; }
+  .btn-yes { flex: 1; background: #1a2e1a; border: 1px solid #5cb85c44; color: #5cb85c; padding: 12px; border-radius: 10px; cursor: pointer; font-size: 13.5px; }
+  .preview-card { background: #0d0f14; border: 1px solid #2a2d3a; border-radius: 10px; padding: 13px 15px; margin-bottom: 9px; }
+  .card-row { display: flex; align-items: flex-start; gap: 9px; background: #13161e; border: 1px solid #2a2d3a; border-radius: 8px; padding: 9px 13px; margin-bottom: 7px; }
+  .card-row .meta { flex: 1; font-size: 13px; }
+  .card-row .meta .q { color: #ddd; }
+  .card-row .meta .s { color: #555; font-size: 11.5px; }
+  .btn-del { background: transparent; border: none; color: #444; cursor: pointer; font-size: 14px; flex-shrink: 0; }
+  .stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; width: 100%; }
+  .stat-box { background: #0d0f14; border: 1px solid #2a2d3a; border-radius: 10px; padding: 14px 8px; text-align: center; }
+  .stat-num { font-size: 24px; font-weight: bold; color: #c9a84c; }
+  .stat-lbl { font-size: 10.5px; color: #555; margin-top: 4px; }
+  .bar-row { display: flex; align-items: center; gap: 9px; margin-bottom: 9px; }
+  .bar-track { flex: 1; height: 8px; background: #0d0f14; border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <span class="logo-emoji">📖</span>
+    <div>
+      <div class="logo-title">COURS DU SOIR</div>
+      <div class="logo-sub sans">+ boîte de Leitner</div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn sans active" id="tab-cours" onclick="switchTab('cours')">Cours</button>
+      <button class="tab-btn sans" id="tab-leitner" onclick="switchTab('leitner')">Leitner</button>
+    </div>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════
+// CONFIG GÉNÉRALE
+// ════════════════════════════════════════════════════════════════════════
+const API_KEY_STORAGE = "csl_api_key";
+let API_KEY = localStorage.getItem(API_KEY_STORAGE) || "";
+
+async function callClaude(systemPrompt, userContent, maxTokens) {
+  if (!API_KEY) {
+    const k = prompt("Colle ta clé API Anthropic (sk-ant-...) — elle sera mémorisée dans ce navigateur uniquement :");
+    if (!k) throw new Error("Clé API requise pour générer du contenu.");
+    API_KEY = k.trim();
+    localStorage.setItem(API_KEY_STORAGE, API_KEY);
+  }
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": API_KEY,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      messages: [{ role: "user", content: userContent }]
+    })
+  });
+  if (res.status === 401) {
+    localStorage.removeItem(API_KEY_STORAGE);
+    API_KEY = "";
+    throw new Error("Clé API invalide ou expirée. Réessaie, on te la redemandera.");
+  }
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message || "Erreur API");
+  const raw = data.content?.find(b => b.type === "text")?.text || "";
+  return raw.replace(/```json|```/g, "").trim();
+}
+
+function switchTab(tab) {
+  document.getElementById('tab-cours').classList.toggle('active', tab === 'cours');
+  document.getElementById('tab-leitner').classList.toggle('active', tab === 'leitner');
+  if (tab === 'cours') renderCoursAccueil();
+  else renderLeitnerHome();
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// MODULE COURS DU SOIR
+// ════════════════════════════════════════════════════════════════════════
+const DOMAINS = [
+  "Sciences & physique (nucléaire, quantique, thermodynamique...)",
+  "Histoire & géopolitique mondiale",
+  "Biologie & médecine",
+  "Espace & astrophysique",
+  "Technologie & IA",
+  "Économie & finance",
+  "Philosophie & psychologie",
+  "Environnement & écologie",
+  "Entrepreneuriat & management",
+  "Géographie & civilisations",
+];
+const LEVELS = ["Débutant", "Intermédiaire", "Avancé"];
+
+const COURS_SYSTEM_PROMPT = `Tu es un professeur passionné, expert et extrêmement pédagogue. Tu génères un cours du soir COMPLET et DENSE sur un sujet donné — pas un résumé superficiel, un vrai cours qui permet de comprendre en profondeur, avec tous les détails, mécanismes, chiffres et nuances nécessaires.
+
+IMPORTANT : Réponds UNIQUEMENT en JSON valide, sans backticks, sans markdown, sans preamble.
+
+Format JSON attendu :
+{
+  "titre": "Titre accrocheur du cours",
+  "emoji": "un emoji représentatif",
+  "accroche": "Une phrase d'accroche percutante (1-2 phrases)",
+  "pourquoi": "Pourquoi ce sujet est important aujourd'hui (3-4 phrases, avec contexte concret)",
+  "chapitres": [
+    {
+      "titre": "Titre du chapitre",
+      "contenu": "Explication APPROFONDIE et complète (10-15 phrases minimum). Couvre le mécanisme/concept en détail, les causes, les conséquences, les chiffres précis, les exceptions ou nuances importantes. Utilise des analogies concrètes ET des exemples réels.",
+      "fait_marquant": "Un fait bluffant ou chiffre clé sur ce chapitre",
+      "a_retenir_absolument": "Le point le plus critique de ce chapitre à ne surtout pas oublier (1-2 phrases)"
+    }
+  ],
+  "schema_ascii": "Un schéma ASCII illustrant le concept principal (8-12 lignes)",
+  "points_cles": ["Point clé 1", "Point clé 2", "Point clé 3", "Point clé 4", "Point clé 5", "Point clé 6"],
+  "ressources": [
+    { "type": "YouTube", "titre": "Titre de vidéo recommandée", "chaine": "Nom de la chaîne YouTube", "url": "https://www.youtube.com/results?search_query=..." },
+    { "type": "Article", "titre": "Titre d'article ou cours en ligne", "source": "Wikipedia / Futura-Sciences / Khan Academy / etc.", "url": "https://fr.wikipedia.org/wiki/..." },
+    { "type": "Podcast", "titre": "Titre ou thème de podcast recommandé", "source": "Nom du podcast", "url": "https://www.google.com/search?q=podcast+..." }
+  ],
+  "question_reflexion": "Une question ouverte qui pousse à réfléchir plus loin",
+  "niveau_difficulte": "Débutant / Intermédiaire / Avancé",
+  "temps_lecture": "X minutes"
+}
+
+Génère entre 4 et 6 chapitres COMPLETS. Privilégie la profondeur à la brièveté. Les ressources doivent être réelles et vérifiables.`;
+
+let coursState = { phase: "accueil", cours: null, activeChapter: 0, error: "", domain: "", level: "Intermédiaire", topic: "" };
+
+function renderCoursAccueil() {
+  coursState = { ...coursState, phase: "accueil" };
+  const main = document.getElementById('main');
+  main.innerHTML = `
+    <div class="card fade-in">
+      <h2 class="card-title">Bonsoir Kévin 👋</h2>
+      <p class="card-sub sans">Prêt pour ton cours du soir ? Choisis un domaine ou laisse-moi surprendre.</p>
+
+      <label class="field-label mono">Domaine (optionnel)</label>
+      <select id="cs-domain" class="sans">
+        <option value="">🎲 Surprise du chef</option>
+        ${DOMAINS.map(d => `<option value="${d}">${d}</option>`).join('')}
+      </select>
+
+      <label class="field-label mono">Sujet précis (optionnel)</label>
+      <input type="text" id="cs-topic" class="sans" placeholder="Ex: la fission nucléaire, Gengis Khan, le Bitcoin...">
+
+      <label class="field-label mono">Niveau</label>
+      <div class="level-row sans" id="cs-levels">
+        ${LEVELS.map(l => `<button class="level-btn ${l === 'Intermédiaire' ? 'active' : ''}" data-level="${l}" onclick="selectLevel('${l}')">${l}</button>`).join('')}
+      </div>
+
+      <button class="btn-primary sans" onclick="lancerCours()">🚀 Lancer le cours</button>
+    </div>`;
+}
+
+function selectLevel(level) {
+  coursState.level = level;
+  document.querySelectorAll('#cs-levels .level-btn').forEach(b => b.classList.toggle('active', b.dataset.level === level));
+}
+
+async function lancerCours() {
+  const domain = document.getElementById('cs-domain')?.value || "";
+  const topic = document.getElementById('cs-topic')?.value.trim() || "";
+  const sujet = topic || (domain ? `un sujet au choix dans : ${domain}` : "un sujet surprenant au choix parmi sciences, histoire, technologie, nature, philosophie");
+
+  coursState.phase = "loading";
+  renderCoursLoading();
+
+  try {
+    const clean = await callClaude(
+      COURS_SYSTEM_PROMPT,
+      `Génère un cours du soir COMPLET et APPROFONDI de niveau ${coursState.level} sur : ${sujet}. Choisis un angle original et inattendu si le sujet est libre. Ne fais surtout pas un résumé superficiel. 5 chapitres denses minimum.`,
+      8000
+    );
+    const parsed = JSON.parse(clean);
+    coursState.cours = parsed;
+    coursState.activeChapter = 0;
+    coursState.phase = "cours";
+    renderCoursResultat();
+  } catch (e) {
+    coursState.error = e.message || String(e);
+    coursState.phase = "erreur";
+    renderCoursErreur();
+  }
+}
+
+function renderCoursLoading() {
+  document.getElementById('main').innerHTML = `
+    <div class="loading-box fade-in">
+      <div class="spinner"></div>
+      <p class="loading-text mono">Préparation du cours...</p>
+      <p class="loading-hint sans">Ton prof cherche le meilleur angle pédagogique ✏️</p>
+    </div>`;
+}
+
+function renderCoursErreur() {
+  document.getElementById('main').innerHTML = `
+    <div class="card fade-in">
+      <p class="error-text sans">⚠️ ${coursState.error}</p>
+      <button class="btn-primary sans" onclick="renderCoursAccueil()">Retour</button>
+    </div>`;
+}
+
+function renderCoursResultat() {
+  const c = coursState.cours;
+  const main = document.getElementById('main');
+  main.innerHTML = `
+    <div class="fade-in" style="width:100%;max-width:760px;display:flex;flex-direction:column;align-items:center;">
+      <div class="hero">
+        <div class="hero-emoji">${c.emoji || '📖'}</div>
+        <div class="badges sans">
+          <span class="badge">${c.niveau_difficulte || ''}</span>
+          <span class="badge">⏱ ${c.temps_lecture || ''}</span>
+        </div>
+        <h1>${c.titre}</h1>
+        <p class="hero-accroche">${c.accroche || ''}</p>
+      </div>
+
+      <div class="section-box pourquoi-box">
+        <span class="section-label mono">🔍 Pourquoi ce sujet ?</span>
+        <p class="section-text sans">${c.pourquoi || ''}</p>
+      </div>
+
+      <div class="chap-tabs" id="chap-tabs"></div>
+      <div id="chap-content"></div>
+
+      ${c.schema_ascii ? `
+      <div class="section-box">
+        <span class="section-label mono">📐 Schéma</span>
+        <pre class="schema-pre mono">${c.schema_ascii}</pre>
+      </div>` : ''}
+
+      <div class="section-box">
+        <span class="section-label mono">✅ Points clés à retenir</span>
+        <ul class="points-list sans">
+          ${(c.points_cles || []).map(p => `<li><span class="dot">▸</span>${p}</li>`).join('')}
+        </ul>
+      </div>
+
+      <div class="section-box">
+        <span class="section-label mono">🔗 Pour aller plus loin</span>
+        ${(c.ressources || []).map(r => `
+          <a class="ressource-link sans" href="${r.url}" target="_blank" rel="noopener noreferrer">
+            <span class="ressource-type mono">${r.type}</span>
+            <div style="flex:1">
+              <div class="ressource-titre">${r.titre}</div>
+              <div class="ressource-source">${r.chaine || r.source || ''}</div>
+            </div>
+            <span class="ressource-arrow">↗</span>
+          </a>`).join('')}
+      </div>
+
+      ${c.question_reflexion ? `
+      <div class="question-box">
+        <span class="section-label mono">🧠 Question pour aller plus loin</span>
+        <p class="question-text">${c.question_reflexion}</p>
+      </div>` : ''}
+
+      <div class="footer-actions">
+        <button class="btn-secondary sans" id="btn-leitner-import" onclick="importerCoursVersLeitner()">🃏 Créer les flashcards Leitner pour ce cours</button>
+        <button class="btn-primary sans" onclick="renderCoursAccueil()">📚 Nouveau cours</button>
+      </div>
+    </div>`;
+  renderChapTabs();
+}
+
+function renderChapTabs() {
+  const c = coursState.cours;
+  const tabsEl = document.getElementById('chap-tabs');
+  tabsEl.innerHTML = (c.chapitres || []).map((ch, i) =>
+    `<button class="chap-tab sans ${i === coursState.activeChapter ? 'active' : ''}" onclick="setChapitre(${i})">${i + 1}. ${ch.titre}</button>`
+  ).join('');
+  renderChapContent();
+}
+
+function setChapitre(i) {
+  coursState.activeChapter = i;
+  renderChapTabs();
+}
+
+function renderChapContent() {
+  const c = coursState.cours;
+  const ch = c.chapitres[coursState.activeChapter];
+  const i = coursState.activeChapter;
+  document.getElementById('chap-content').innerHTML = `
+    <div class="chap-box fade-in">
+      <h3>${ch.titre}</h3>
+      <p class="content sans">${ch.contenu}</p>
+      ${ch.fait_marquant ? `
+      <div class="fait-box">
+        <span class="fait-label mono">⚡ Fait marquant</span>
+        <p class="sans" style="font-size:14px;color:#ddd">${ch.fait_marquant}</p>
+      </div>` : ''}
+      ${ch.a_retenir_absolument ? `
+      <div class="retenir-box">
+        <span class="retenir-label mono">🎯 À retenir absolument</span>
+        <p class="sans" style="font-size:14px;color:#ddd">${ch.a_retenir_absolument}</p>
+      </div>` : ''}
+      <div class="chap-nav2">
+        ${i > 0 ? `<button class="nav-btn sans" onclick="setChapitre(${i - 1})">← Précédent</button>` : '<span></span>'}
+        ${i < c.chapitres.length - 1 ? `<button class="nav-btn next sans" onclick="setChapitre(${i + 1})">Suivant →</button>` : ''}
+      </div>
+    </div>`;
+}
+
+function importerCoursVersLeitner() {
+  const c = coursState.cours;
+  if (!c) return;
+  const btn = document.getElementById('btn-leitner-import');
+  btn.disabled = true;
+  btn.textContent = "⏳ Génération des flashcards...";
+  genererCartesDepuisCours(c).then(n => {
+    btn.classList.add('success');
+    btn.textContent = `✅ ${n} cartes ajoutées au Leitner !`;
+  }).catch(e => {
+    btn.classList.add('error');
+    btn.textContent = "⚠️ Erreur — réessaie";
+    btn.disabled = false;
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// MODULE LEITNER
+// ════════════════════════════════════════════════════════════════════════
+const LEITNER_STORAGE = "leitner_cards_v2";
+
+const BOXES = [
+  { id: 1, label: "Boîte 1", desc: "Tous les jours", color: "#e05c5c" },
+  { id: 2, label: "Boîte 2", desc: "Tous les 2 jours", color: "#e0954a" },
+  { id: 3, label: "Boîte 3", desc: "Tous les 4 jours", color: "#d4c84a" },
+  { id: 4, label: "Boîte 4", desc: "Tous les 8 jours", color: "#5cb85c" },
+  { id: 5, label: "Boîte 5", desc: "Tous les 16 jours", color: "#5b9bd5" },
+  { id: 6, label: "Maîtrisé", desc: "Tous les 32 jours", color: "#9b6bd5" },
+];
+const BOX_INTERVALS = { 1: 0, 2: 2, 3: 4, 4: 8, 5: 16, 6: 32 };
+const MAX_BOX = 6;
+
+function loadCards() {
+  try { return JSON.parse(localStorage.getItem(LEITNER_STORAGE)) || []; } catch { return []; }
+}
+function saveCards(cards) {
+  localStorage.setItem(LEITNER_STORAGE, JSON.stringify(cards));
+}
+function isDueToday(card) {
+  if (card.box === 1) return true;
+  if (!card.lastReviewed) return true;
+  const days = (Date.now() - new Date(card.lastReviewed).getTime()) / 86400000;
+  return days >= BOX_INTERVALS[card.box];
+}
+function newCard(question, answer, subject) {
+  return { id: Date.now() + Math.random(), question, answer, subject: subject || "Sans sujet", box: 1, lastReviewed: null, createdAt: new Date().toISOString() };
+}
+
+const LEITNER_SYSTEM_PROMPT = `Tu es un créateur de flashcards pédagogiques expert en méthode Leitner. Tu reçois soit un sujet court, soit le contenu complet d'un cours (titre + chapitres + points clés).
+
+Génère entre 6 et 10 questions-réponses qui couvrent l'ENSEMBLE des notions importantes du contenu fourni. Si plusieurs chapitres sont fournis, assure-toi qu'au moins une carte couvre chaque chapitre. Réponses courtes (1-3 phrases max).
+
+Réponds UNIQUEMENT en JSON valide, sans backticks, sans preamble.
+Format :
+{ "sujet": "Nom court", "cartes": [ { "question": "...", "answer": "..." } ] }`;
+
+let leitnerState = { view: "home", reviewQueue: [], reviewIndex: 0, showAnswer: false, genPreview: null };
+
+async function genererCartesDepuisCours(cours) {
+  const chapitresTxt = (cours.chapitres || []).map((ch, i) =>
+    `Chapitre ${i + 1} — ${ch.titre} : ${ch.contenu} Fait marquant : ${ch.fait_marquant || ''} À retenir : ${ch.a_retenir_absolument || ''}`
+  ).join("\n\n");
+  const pointsTxt = (cours.points_cles || []).join(" / ");
+  const contenu = `Titre du cours : ${cours.titre}\n\n${chapitresTxt}\n\nPoints clés : ${pointsTxt}`;
+
+  const clean = await callClaude(LEITNER_SYSTEM_PROMPT, contenu, 3000);
+  const parsed = JSON.parse(clean);
+  const cards = loadCards();
+  const newCards = parsed.cartes.map(c => newCard(c.question, c.answer, parsed.sujet || cours.titre));
+  saveCards([...cards, ...newCards]);
+  return newCards.length;
+}
+
+function renderLeitnerHome() {
+  leitnerState.view = "home";
+  const cards = loadCards();
+  const due = cards.filter(isDueToday);
+  const subjects = [...new Set(cards.map(c => c.subject))];
+
+  document.getElementById('main').innerHTML = `
+    <div class="fade-in" style="width:100%;max-width:600px">
+      <div class="due-banner sans" style="background:${due.length > 0 ? '#1a2e1a' : '#13161e'};border-color:${due.length > 0 ? '#5cb85c44' : '#2a2d3a'}">
+        <div class="due-num mono">${due.length}</div>
+        <div>
+          <div style="color:#e8e4d9;font-size:15px;margin-bottom:2px">${due.length === 0 ? "Rien à réviser aujourd'hui 🎉" : `carte${due.length > 1 ? 's' : ''} à réviser`}</div>
+          <div style="color:#666;font-size:12.5px">${cards.length} cartes au total</div>
+        </div>
+        ${due.length > 0 ? `<button class="btn-primary sans" style="margin-left:auto;padding:10px 18px;font-size:13px" onclick="startReview()">Réviser →</button>` : ''}
+      </div>
+
+      <div class="box-grid">
+        ${BOXES.map(b => {
+          const count = cards.filter(c => c.box === b.id).length;
+          return `<div class="box-card">
+            <div class="num mono" style="color:${b.color}">${count}</div>
+            <div class="desc sans">${b.desc}</div>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <div class="actions-col">
+        <button class="action-btn sans" onclick="renderLeitnerGenerate()"><span class="ic">✨</span>Générer depuis un cours</button>
+        <button class="action-btn sans" onclick="renderLeitnerAdd()"><span class="ic">➕</span>Ajouter manuellement</button>
+        <button class="action-btn sans" onclick="renderLeitnerStats()"><span class="ic">📊</span>Voir les stats</button>
+      </div>
+    </div>`;
+}
+
+function startReview() {
+  const due = loadCards().filter(isDueToday);
+  if (!due.length) return;
+  leitnerState.reviewQueue = [...due].sort(() => Math.random() - 0.5);
+  leitnerState.reviewIndex = 0;
+  leitnerState.showAnswer = false;
+  leitnerState.view = "review";
+  renderReviewCard();
+}
+
+function renderReviewCard() {
+  const { reviewQueue, reviewIndex, showAnswer } = leitnerState;
+  const card = reviewQueue[reviewIndex];
+  const box = BOXES.find(b => b.id === card.box);
+
+  document.getElementById('main').innerHTML = `
+    <div style="width:100%;max-width:560px" class="fade-in">
+      <div class="progress-row">
+        <span class="sans" style="font-size:13px;color:#666">${reviewIndex + 1} / ${reviewQueue.length}</span>
+        <div class="progress-track"><div class="progress-fill" style="width:${(reviewIndex / reviewQueue.length) * 100}%"></div></div>
+      </div>
+      <div class="flashcard">
+        <div class="flashcard-top sans">
+          <span style="color:#666">${card.subject}</span>
+          <span class="mono" style="color:${box.color}">${box.label}</span>
+        </div>
+        <div class="card-question">${card.question}</div>
+        ${!showAnswer
+          ? `<button class="btn-reveal sans" onclick="revealAnswer()">Voir la réponse</button>`
+          : `<div class="card-answer sans">${card.answer}</div>
+             <div class="result-btns sans">
+               <button class="btn-no" onclick="handleResult(false)">✗ Je ne savais pas</button>
+               <button class="btn-yes" onclick="handleResult(true)">✓ Je savais !</button>
+             </div>`
+        }
+      </div>
+    </div>`;
+}
+
+function revealAnswer() {
+  leitnerState.showAnswer = true;
+  renderReviewCard();
+}
+
+function handleResult(knew) {
+  const cards = loadCards();
+  const card = leitnerState.reviewQueue[leitnerState.reviewIndex];
+  const newBox = knew ? Math.min(card.box + 1, MAX_BOX) : 1;
+  const updated = cards.map(c => c.id === card.id ? { ...c, box: newBox, lastReviewed: new Date().toISOString() } : c);
+  saveCards(updated);
+
+  if (leitnerState.reviewIndex + 1 >= leitnerState.reviewQueue.length) {
+    renderLeitnerHome();
+  } else {
+    leitnerState.reviewIndex++;
+    leitnerState.showAnswer = false;
+    renderReviewCard();
+  }
+}
+
+function renderLeitnerGenerate() {
+  leitnerState.view = "generate";
+  leitnerState.genPreview = null;
+  document.getElementById('main').innerHTML = `
+    <div style="width:100%;max-width:560px" class="fade-in">
+      <button class="nav-btn sans" style="margin-bottom:16px" onclick="renderLeitnerHome()">← Retour</button>
+      <h2 class="card-title" style="font-size:20px;margin-bottom:8px">✨ Générer depuis un cours</h2>
+      <p class="sans" style="font-size:14px;color:#666;margin-bottom:18px">Colle le titre, ou idéalement tout le contenu de ton cours du soir — 6 à 10 cartes seront générées pour couvrir l'ensemble des notions.</p>
+
+      <label class="field-label mono">Sujet ou contenu du cours</label>
+      <textarea id="gen-topic" class="sans" style="margin-top:6px;min-height:140px" placeholder="Colle ici le titre + les chapitres, ou juste un sujet court..."></textarea>
+
+      <button class="btn-primary sans" style="width:100%;margin-top:12px" id="gen-btn" onclick="generateLeitnerCards()">🚀 Générer les cartes</button>
+      <div id="gen-error"></div>
+      <div id="gen-preview"></div>
+    </div>`;
+}
+
+async function generateLeitnerCards() {
+  const topic = document.getElementById('gen-topic').value.trim();
+  if (!topic) return;
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true;
+  btn.textContent = "Génération en cours...";
+  document.getElementById('gen-error').innerHTML = '';
+  try {
+    const clean = await callClaude(LEITNER_SYSTEM_PROMPT, topic, 3000);
+    const parsed = JSON.parse(clean);
+    leitnerState.genPreview = parsed;
+    document.getElementById('gen-preview').innerHTML = `
+      <div style="margin-top:24px">
+        <div class="field-label mono">Aperçu — ${parsed.sujet} (${parsed.cartes.length} cartes)</div>
+        <div style="margin-top:12px">
+          ${parsed.cartes.map(c => `
+            <div class="preview-card">
+              <div class="sans" style="font-size:14px;color:#ddd;margin-bottom:6px">❓ ${c.question}</div>
+              <div class="sans" style="font-size:13px;color:#888;font-style:italic">💡 ${c.answer}</div>
+            </div>`).join('')}
+        </div>
+        <button class="btn-primary sans" style="width:100%;margin-top:16px" onclick="importGeneratedCards()">✅ Importer ces ${parsed.cartes.length} cartes</button>
+      </div>`;
+  } catch (e) {
+    document.getElementById('gen-error').innerHTML = `<p class="error-text sans" style="font-size:14px;margin-top:10px">${e.message}</p>`;
+  }
+  btn.disabled = false;
+  btn.textContent = "🚀 Générer les cartes";
+}
+
+function importGeneratedCards() {
+  const parsed = leitnerState.genPreview;
+  if (!parsed) return;
+  const cards = loadCards();
+  const newCards = parsed.cartes.map(c => newCard(c.question, c.answer, parsed.sujet));
+  saveCards([...cards, ...newCards]);
+  renderLeitnerHome();
+}
+
+function renderLeitnerAdd() {
+  leitnerState.view = "add";
+  const cards = loadCards();
+  document.getElementById('main').innerHTML = `
+    <div style="width:100%;max-width:560px" class="fade-in">
+      <button class="nav-btn sans" style="margin-bottom:16px" onclick="renderLeitnerHome()">← Retour</button>
+      <h2 class="card-title" style="font-size:20px;margin-bottom:16px">➕ Ajouter une carte</h2>
+
+      <label class="field-label mono">Sujet</label>
+      <input type="text" id="man-subj" class="sans" style="margin-top:6px;margin-bottom:14px" placeholder="Ex: Cordiste, VTTAE, Port...">
+
+      <label class="field-label mono">Question</label>
+      <input type="text" id="man-q" class="sans" style="margin-top:6px;margin-bottom:14px" placeholder="Ta question...">
+
+      <label class="field-label mono">Réponse</label>
+      <textarea id="man-a" class="sans" style="margin-top:6px;margin-bottom:14px" placeholder="La réponse..."></textarea>
+
+      <button class="btn-primary sans" style="width:100%" onclick="addManualCard()">Ajouter la carte</button>
+
+      ${cards.length > 0 ? `
+      <div style="margin-top:30px">
+        <div class="field-label mono">Toutes les cartes (${cards.length})</div>
+        <div style="margin-top:12px" id="cards-list">
+          ${cards.map(c => {
+            const box = BOXES.find(b => b.id === c.box);
+            return `<div class="card-row">
+              <span class="mono" style="font-size:11px;color:${box.color}">●</span>
+              <div class="meta sans"><div class="q">${c.question}</div><div class="s">${c.subject}</div></div>
+              <button class="btn-del" onclick="deleteCard(${c.id})">✕</button>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>` : ''}
+    </div>`;
+}
+
+function addManualCard() {
+  const q = document.getElementById('man-q').value.trim();
+  const a = document.getElementById('man-a').value.trim();
+  const subj = document.getElementById('man-subj').value.trim();
+  if (!q || !a) return;
+  const cards = loadCards();
+  saveCards([...cards, newCard(q, a, subj)]);
+  renderLeitnerAdd();
+}
+
+function deleteCard(id) {
+  const cards = loadCards().filter(c => c.id !== id);
+  saveCards(cards);
+  renderLeitnerAdd();
+}
+
+function renderLeitnerStats() {
+  leitnerState.view = "stats";
+  const cards = loadCards();
+  const due = cards.filter(isDueToday);
+  const subjects = [...new Set(cards.map(c => c.subject))];
+
+  document.getElementById('main').innerHTML = `
+    <div style="width:100%;max-width:560px" class="fade-in">
+      <button class="nav-btn sans" style="margin-bottom:16px" onclick="renderLeitnerHome()">← Retour</button>
+      <h2 class="card-title" style="font-size:20px;margin-bottom:16px">📊 Statistiques</h2>
+
+      <div class="stat-grid">
+        <div class="stat-box"><div class="stat-num mono">${cards.length}</div><div class="stat-lbl sans">Total cartes</div></div>
+        <div class="stat-box"><div class="stat-num mono">${due.length}</div><div class="stat-lbl sans">À réviser</div></div>
+        <div class="stat-box"><div class="stat-num mono">${cards.filter(c => c.box === MAX_BOX).length}</div><div class="stat-lbl sans">Maîtrisées</div></div>
+        <div class="stat-box"><div class="stat-num mono">${subjects.length}</div><div class="stat-lbl sans">Sujets</div></div>
+      </div>
+
+      <div style="margin-top:24px">
+        <div class="field-label mono">Répartition par boîte</div>
+        <div style="margin-top:12px">
+          ${BOXES.map(b => {
+            const count = cards.filter(c => c.box === b.id).length;
+            const pct = cards.length ? (count / cards.length) * 100 : 0;
+            return `<div class="bar-row">
+              <span class="sans" style="font-size:12.5px;color:#888;width:90px;flex-shrink:0">${b.label}</span>
+              <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${b.color}"></div></div>
+              <span class="mono" style="font-size:12.5px;width:24px;text-align:right;color:#555">${count}</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      ${subjects.length > 0 ? `
+      <div style="margin-top:24px">
+        <div class="field-label mono">Par sujet</div>
+        <div style="margin-top:12px">
+          ${subjects.map(s => `
+            <div class="sans" style="display:flex;justify-content:space-between;align-items:center;font-size:13.5px;padding:8px 0;border-bottom:1px solid #1e2130">
+              <span style="color:#ccc">${s}</span>
+              <span style="color:#555;font-size:11.5px">${cards.filter(c => c.subject === s).length} cartes</span>
+            </div>`).join('')}
+        </div>
+      </div>` : ''}
+    </div>`;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════════════
+renderCoursAccueil();
+</script>
+</body>
+</html>
