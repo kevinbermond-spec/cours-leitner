@@ -471,6 +471,7 @@ function renderCoursResultat() {
       </div>` : ''}
 
       <div class="footer-actions">
+        <button class="btn-secondary sans" onclick="telechargerCoursMarkdown()">📄 Télécharger pour Notion (.md)</button>
         <button class="btn-secondary sans" id="btn-leitner-import" onclick="importerCoursVersLeitner()">🃏 Créer les flashcards Leitner pour ce cours</button>
         <button class="btn-primary sans" onclick="renderCoursAccueil()">📚 Nouveau cours</button>
       </div>
@@ -515,6 +516,56 @@ function renderChapContent() {
         ${i < c.chapitres.length - 1 ? `<button class="nav-btn next sans" onclick="setChapitre(${i + 1})">Suivant →</button>` : ''}
       </div>
     </div>`;
+}
+
+function genererMarkdownCours(c) {
+  const date = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  let md = `# ${c.emoji || ''} ${c.titre}\n\n`;
+  md += `*Niveau : ${c.niveau_difficulte || ''} — Temps de lecture : ${c.temps_lecture || ''} — Généré le ${date}*\n\n`;
+  md += `> ${c.accroche || ''}\n\n`;
+  md += `## 🔍 Pourquoi ce sujet ?\n\n${c.pourquoi || ''}\n\n---\n\n`;
+  (c.chapitres || []).forEach((ch, i) => {
+    md += `## Chapitre ${i + 1} : ${ch.titre}\n\n${ch.contenu}\n\n`;
+    if (ch.fait_marquant) md += `> ⚡ **Fait marquant** : ${ch.fait_marquant}\n\n`;
+    if (ch.a_retenir_absolument) md += `> 🎯 **À retenir absolument** : ${ch.a_retenir_absolument}\n\n`;
+    md += `---\n\n`;
+  });
+  if (c.schema_ascii) {
+    md += `## 📐 Schéma\n\n\`\`\`\n${c.schema_ascii}\n\`\`\`\n\n---\n\n`;
+  }
+  md += `## ✅ Points clés\n\n`;
+  (c.points_cles || []).forEach(p => { md += `- ${p}\n`; });
+  md += `\n---\n\n## 🔗 Pour aller plus loin\n\n`;
+  (c.ressources || []).forEach(r => {
+    md += `- **${r.type}** — [${r.titre}](${r.url}) (${r.chaine || r.source || ''})\n`;
+  });
+  if (c.question_reflexion) {
+    md += `\n---\n\n## 🧠 Question de réflexion\n\n> ${c.question_reflexion}\n`;
+  }
+  return md;
+}
+
+function slugify(str) {
+  return str.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+    .slice(0, 60);
+}
+
+function telechargerCoursMarkdown() {
+  const c = coursState.cours;
+  if (!c) return;
+  const md = genererMarkdownCours(c);
+  const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `cours-${slugify(c.titre || 'sans-titre')}.md`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 function importerCoursVersLeitner() {
