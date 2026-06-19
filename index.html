@@ -205,6 +205,9 @@ async function callClaude(systemPrompt, userContent, maxTokens) {
   }
   const data = await res.json();
   if (data.error) throw new Error(data.error.message || "Erreur API");
+  if (data.stop_reason === "max_tokens") {
+    throw new Error("Le cours généré était trop long et a été coupé. Réessaie — ou choisis un sujet un peu plus ciblé.");
+  }
   const raw = data.content?.find(b => b.type === "text")?.text || "";
   return raw.replace(/```json|```/g, "").trim();
 }
@@ -265,7 +268,7 @@ Format JSON attendu :
   "temps_lecture": "X minutes"
 }
 
-Génère entre 4 et 6 chapitres COMPLETS. Privilégie la profondeur à la brièveté. Les ressources doivent être réelles et vérifiables.`;
+Génère entre 4 et 5 chapitres COMPLETS (pas plus, pour rester lisible). Privilégie la profondeur à la brièveté dans cette limite. Les ressources doivent être réelles et vérifiables. IMPORTANT : ta réponse JSON doit être complète et se terminer correctement — ne commence jamais un chapitre que tu ne pourras pas finir.`;
 
 let coursState = { phase: "accueil", cours: null, activeChapter: 0, error: "", domain: "", level: "Intermédiaire", topic: "" };
 
@@ -311,8 +314,8 @@ async function lancerCours() {
   try {
     const clean = await callClaude(
       COURS_SYSTEM_PROMPT,
-      `Génère un cours du soir COMPLET et APPROFONDI de niveau ${coursState.level} sur : ${sujet}. Choisis un angle original et inattendu si le sujet est libre. Ne fais surtout pas un résumé superficiel. 5 chapitres denses minimum.`,
-      8000
+      `Génère un cours du soir COMPLET et APPROFONDI de niveau ${coursState.level} sur : ${sujet}. Choisis un angle original et inattendu si le sujet est libre. Ne fais surtout pas un résumé superficiel. 4 à 5 chapitres denses, et assure-toi de terminer complètement ta réponse JSON.`,
+      16000
     );
     const parsed = JSON.parse(clean);
     coursState.cours = parsed;
