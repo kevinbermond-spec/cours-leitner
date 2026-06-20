@@ -67,6 +67,15 @@
   }
   .btn-secondary.success { background: #1a2e1a; border-color: #5cb85c; color: #5cb85c; }
   .btn-secondary.error { background: #2e1a1a; border-color: #e05c5c; color: #e05c5c; }
+  .btn-leitner {
+    background: #5cb85c; color: #0d0f14; border: none; padding: 13px 28px;
+    border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; letter-spacing: 0.5px;
+    width: 100%; max-width: 320px;
+  }
+  .btn-leitner:hover { box-shadow: 0 0 20px #5cb85c55; }
+  .btn-leitner:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+  .btn-leitner.success { background: #1a2e1a; border: 1px solid #5cb85c; color: #5cb85c; }
+  .btn-leitner.error { background: #2e1a1a; border: 1px solid #e05c5c; color: #e05c5c; }
 
   .loading-box { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 60px; }
   .spinner { width: 44px; height: 44px; border: 3px solid #2a2d3a; border-top: 3px solid #c9a84c; border-radius: 50%; animation: spin 0.8s linear infinite; }
@@ -99,7 +108,26 @@
   .chap-nav2 { display: flex; gap: 10px; justify-content: space-between; }
   .nav-btn { background: transparent; border: 1px solid #2a2d3a; color: #888; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; }
   .nav-btn.next { background: #c9a84c22; border-color: #c9a84c; color: #c9a84c; margin-left: auto; }
-  .schema-pre { color: #7ec8a4; font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; overflow-x: auto; }
+  /* ── Schémas graphiques ── */
+  .schema-pyramide { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 0; }
+  .pyr-level { border: 1px solid; border-radius: 8px; padding: 10px 14px; text-align: center; transition: transform 0.15s; }
+  .pyr-label { font-size: 13.5px; color: #f0ead6; font-weight: bold; }
+  .pyr-detail { font-size: 11.5px; color: #aaa; margin-top: 3px; }
+
+  .schema-flux, .schema-cycle { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0; width: 100%; }
+  .flux-step, .cycle-step { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 420px; }
+  .flux-num, .cycle-num { background: #c9a84c; color: #0d0f14; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; flex-shrink: 0; }
+  .flux-box, .cycle-box { flex: 1; background: #0d0f14; border: 1px solid #2a2d3a; border-radius: 8px; padding: 9px 13px; }
+  .flux-label, .cycle-label { font-size: 13.5px; color: #f0ead6; font-weight: bold; }
+  .flux-detail, .cycle-detail { font-size: 11.5px; color: #999; margin-top: 2px; }
+  .flux-arrow, .cycle-arrow { color: #c9a84c; font-size: 16px; padding: 1px 0; }
+  .cycle-loop { font-size: 11.5px; color: #888; }
+
+  .schema-comparaison { display: flex; align-items: stretch; gap: 10px; width: 100%; flex-wrap: wrap; justify-content: center; }
+  .comp-col { flex: 1; min-width: 110px; background: #0d0f14; border: 1px solid #2a2d3a; border-radius: 10px; padding: 14px 12px; text-align: center; }
+  .comp-label { font-size: 13.5px; color: #f0ead6; font-weight: bold; margin-bottom: 4px; }
+  .comp-detail { font-size: 11.5px; color: #999; }
+  .comp-vs { color: #c9a84c; font-size: 12px; display: flex; align-items: center; padding: 0 2px; }
   .points-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
   .points-list li { display: flex; gap: 9px; color: #ccc; font-size: 14px; line-height: 1.5; }
   .points-list .dot { color: #c9a84c; flex-shrink: 0; }
@@ -256,7 +284,13 @@ Format JSON attendu :
       "a_retenir_absolument": "Le point le plus critique de ce chapitre à ne surtout pas oublier (1-2 phrases)"
     }
   ],
-  "schema_ascii": "Un schéma ASCII illustrant le concept principal (8-12 lignes)",
+  "schema": {
+    "type": "pyramide | flux | cycle | comparaison",
+    "titre": "Titre court du schéma",
+    "elements": [
+      { "label": "Nom de l'élément (court, 2-5 mots)", "detail": "Précision courte optionnelle (1 phrase max)" }
+    ]
+  },
   "points_cles": ["Point clé 1", "Point clé 2", "Point clé 3", "Point clé 4", "Point clé 5", "Point clé 6"],
   "ressources": [
     { "type": "YouTube", "titre": "Titre de vidéo recommandée", "chaine": "Nom de la chaîne YouTube", "url": "https://www.youtube.com/results?search_query=..." },
@@ -268,6 +302,8 @@ Format JSON attendu :
   "temps_lecture": "X minutes"
 }
 
+Pour le schéma : choisis le type le plus pertinent pour le sujet — "pyramide" pour une hiérarchie sociale/organisationnelle (du sommet à la base, 3 à 6 niveaux), "flux" pour un processus séquentiel ou une chronologie (3 à 6 étapes dans l'ordre), "cycle" pour quelque chose qui boucle (3 à 6 étapes qui reviennent au début), "comparaison" pour opposer 2 à 4 concepts/camps côte à côte. Chaque élément doit avoir un label court et clair, et un detail optionnel pour préciser.
+
 Génère entre 4 et 5 chapitres COMPLETS (pas plus, pour rester lisible). Privilégie la profondeur à la brièveté dans cette limite. Les ressources doivent être réelles et vérifiables. IMPORTANT : ta réponse JSON doit être complète et se terminer correctement — ne commence jamais un chapitre que tu ne pourras pas finir.`;
 
 let coursState = { phase: "accueil", cours: null, activeChapter: 0, error: "", domain: "", level: "Intermédiaire", topic: "" };
@@ -275,7 +311,16 @@ let coursState = { phase: "accueil", cours: null, activeChapter: 0, error: "", d
 function renderCoursAccueil() {
   coursState = { ...coursState, phase: "accueil" };
   const main = document.getElementById('main');
+  const dueCount = loadCards().filter(isDueToday).length;
   main.innerHTML = `
+    ${dueCount > 0 ? `
+    <div class="due-banner sans" style="background:#1a2e1a;border-color:#5cb85c44;max-width:560px;cursor:pointer" onclick="switchTab('leitner')">
+      <div class="due-num mono" style="font-size:28px">${dueCount}</div>
+      <div style="flex:1">
+        <div style="color:#e8e4d9;font-size:14px">carte${dueCount > 1 ? 's' : ''} à réviser avant de continuer 👀</div>
+        <div style="color:#888;font-size:12px">Appuie ici pour aller réviser</div>
+      </div>
+    </div>` : ''}
     <div class="card fade-in">
       <h2 class="card-title">Bonsoir Kévin 👋</h2>
       <p class="card-sub sans">Prêt pour ton cours du soir ? Choisis un domaine ou laisse-moi surprendre.</p>
@@ -418,6 +463,71 @@ function renderCoursErreur() {
     </div>`;
 }
 
+function escHtml(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function renderSchema(schema) {
+  const type = schema.type || 'flux';
+  const elements = schema.elements || [];
+  if (!elements.length) return '';
+
+  if (type === 'pyramide') {
+    const n = elements.length;
+    return `<div class="schema-pyramide">
+      ${elements.map((el, i) => {
+        const widthPct = 30 + (i * (60 / Math.max(n - 1, 1)));
+        const hue = 45 - (i * (25 / Math.max(n - 1, 1)));
+        return `<div class="pyr-level" style="width:${widthPct}%;background:hsl(${hue},45%,${18 + i * 2}%);border-color:hsl(${hue},55%,40%)">
+          <div class="pyr-label sans">${escHtml(el.label)}</div>
+          ${el.detail ? `<div class="pyr-detail sans">${escHtml(el.detail)}</div>` : ''}
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  if (type === 'cycle') {
+    return `<div class="schema-cycle">
+      ${elements.map((el, i) => `
+        <div class="cycle-step">
+          <div class="cycle-num mono">${i + 1}</div>
+          <div class="cycle-box">
+            <div class="cycle-label sans">${escHtml(el.label)}</div>
+            ${el.detail ? `<div class="cycle-detail sans">${escHtml(el.detail)}</div>` : ''}
+          </div>
+        </div>
+        ${i < elements.length - 1 ? '<div class="cycle-arrow">↓</div>' : '<div class="cycle-arrow cycle-loop">↺ retour au début</div>'}
+      `).join('')}
+    </div>`;
+  }
+
+  if (type === 'comparaison') {
+    return `<div class="schema-comparaison">
+      ${elements.map((el, i) => `
+        <div class="comp-col">
+          <div class="comp-label sans">${escHtml(el.label)}</div>
+          ${el.detail ? `<div class="comp-detail sans">${escHtml(el.detail)}</div>` : ''}
+        </div>
+        ${i < elements.length - 1 ? '<div class="comp-vs mono">VS</div>' : ''}
+      `).join('')}
+    </div>`;
+  }
+
+  // flux (par défaut)
+  return `<div class="schema-flux">
+    ${elements.map((el, i) => `
+      <div class="flux-step">
+        <div class="flux-num mono">${i + 1}</div>
+        <div class="flux-box">
+          <div class="flux-label sans">${escHtml(el.label)}</div>
+          ${el.detail ? `<div class="flux-detail sans">${escHtml(el.detail)}</div>` : ''}
+        </div>
+      </div>
+      ${i < elements.length - 1 ? '<div class="flux-arrow">→</div>' : ''}
+    `).join('')}
+  </div>`;
+}
+
 function renderCoursResultat() {
   const c = coursState.cours;
   const main = document.getElementById('main');
@@ -441,10 +551,10 @@ function renderCoursResultat() {
       <div class="chap-tabs" id="chap-tabs"></div>
       <div id="chap-content"></div>
 
-      ${c.schema_ascii ? `
+      ${c.schema ? `
       <div class="section-box">
-        <span class="section-label mono">📐 Schéma</span>
-        <pre class="schema-pre mono">${c.schema_ascii}</pre>
+        <span class="section-label mono">📐 ${c.schema.titre || 'Schéma'}</span>
+        ${renderSchema(c.schema)}
       </div>` : ''}
 
       <div class="section-box">
@@ -474,8 +584,8 @@ function renderCoursResultat() {
       </div>` : ''}
 
       <div class="footer-actions">
+        <button class="btn-leitner sans" id="btn-leitner-import" onclick="importerCoursVersLeitner()">🃏 Créer les flashcards Leitner pour ce cours</button>
         <button class="btn-secondary sans" onclick="telechargerCoursMarkdown()">📄 Télécharger pour Notion (.md)</button>
-        <button class="btn-secondary sans" id="btn-leitner-import" onclick="importerCoursVersLeitner()">🃏 Créer les flashcards Leitner pour ce cours</button>
         <button class="btn-primary sans" onclick="renderCoursAccueil()">📚 Nouveau cours</button>
       </div>
     </div>`;
@@ -533,8 +643,13 @@ function genererMarkdownCours(c) {
     if (ch.a_retenir_absolument) md += `> 🎯 **À retenir absolument** : ${ch.a_retenir_absolument}\n\n`;
     md += `---\n\n`;
   });
-  if (c.schema_ascii) {
-    md += `## 📐 Schéma\n\n\`\`\`\n${c.schema_ascii}\n\`\`\`\n\n---\n\n`;
+  if (c.schema && c.schema.elements && c.schema.elements.length) {
+    md += `## 📐 ${c.schema.titre || 'Schéma'}\n\n`;
+    c.schema.elements.forEach((el, i) => {
+      const arrow = c.schema.type === 'comparaison' ? (i > 0 ? '**VS** ' : '') : `${i + 1}. `;
+      md += `${arrow}**${el.label}**${el.detail ? ` — ${el.detail}` : ''}\n\n`;
+    });
+    md += `---\n\n`;
   }
   md += `## ✅ Points clés\n\n`;
   (c.points_cles || []).forEach(p => { md += `- ${p}\n`; });
@@ -896,9 +1011,19 @@ function renderLeitnerStats() {
 }
 
 // ════════════════════════════════════════════════════════════════════════
-// INIT
+// INIT — priorité au Leitner si des cartes sont dues aujourd'hui
 // ════════════════════════════════════════════════════════════════════════
-renderCoursAccueil();
+function initApp() {
+  const dueCount = loadCards().filter(isDueToday).length;
+  if (dueCount > 0) {
+    document.getElementById('tab-cours').classList.remove('active');
+    document.getElementById('tab-leitner').classList.add('active');
+    renderLeitnerHome();
+  } else {
+    renderCoursAccueil();
+  }
+}
+initApp();
 </script>
 </body>
 </html>
